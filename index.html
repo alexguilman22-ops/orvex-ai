@@ -1,0 +1,106 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ORVEX AI</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#090b12;color:#f5f6ff;font-family:Arial,sans-serif}
+.app{display:flex;min-height:100vh}
+aside{width:245px;background:#10131e;padding:25px 17px;border-right:1px solid #252a3a}
+.logo{font-size:27px;font-weight:900;letter-spacing:2px;color:#9b8cff;margin-bottom:35px}
+.logo span{color:#fff}
+nav button{display:block;width:100%;text-align:left;padding:14px;margin:7px 0;background:transparent;color:#c5c8d8;border:0;border-radius:10px;font-size:15px;cursor:pointer}
+nav button:hover,nav button.active{background:#25213e;color:#b8aaff}
+main{flex:1;padding:35px;display:flex;flex-direction:column;min-width:0}
+header{display:flex;justify-content:space-between;align-items:center}
+header h2{font-size:19px}
+.tag{background:#24203e;color:#b7a6ff;padding:9px 14px;border-radius:20px;font-size:12px}
+.welcome{text-align:center;margin:auto;max-width:750px;width:100%}
+.welcome h1{font-size:45px;margin-bottom:10px}
+.welcome h1 span{color:#a18aff}
+.welcome p{color:#9da2b6}
+.tools{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:30px 0}
+.tools button{background:#171b2a;border:1px solid #30364a;color:white;padding:15px 20px;border-radius:13px;cursor:pointer}
+.tools button:hover{border-color:#9b8cff}
+.chat{width:100%;max-width:750px;margin:0 auto}
+.messages{max-height:45vh;overflow:auto;margin-bottom:15px}
+.message{padding:15px 18px;background:#171b2a;border-radius:14px;margin:12px 0;line-height:1.5;white-space:pre-wrap}
+.message.user{background:#292342;margin-left:12%}
+.composer{display:flex;gap:10px;background:#171b2a;padding:10px;border:1px solid #30364a;border-radius:16px}
+.composer input{flex:1;min-width:0;background:transparent;border:0;outline:0;color:white;padding:10px;font-size:15px}
+.composer button{background:#927cff;border:0;border-radius:11px;padding:12px 19px;color:white;font-weight:bold;cursor:pointer}
+.note{text-align:center;color:#777f95;font-size:11px;margin-top:12px}
+@media(max-width:650px){aside{width:75px;padding:15px 7px}.logo{font-size:15px;text-align:center}nav button{font-size:0;text-align:center;padding:14px 2px}nav button:first-letter{font-size:19px}main{padding:18px 12px}.welcome h1{font-size:34px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+<div class="logo">ORVEX<span> AI</span></div>
+<nav>
+<button class="active" onclick="showTab('chat')">💬 Chat</button>
+<button onclick="showTab('image')">🎨 Imágenes</button>
+<button onclick="showTab('video')">🎬 Videos</button>
+<button onclick="showTab('library')">📁 Biblioteca</button>
+</nav>
+</aside>
+<main>
+<header>
+<h2 id="section">Chat inteligente</h2>
+<div class="tag">ORVEX AI · BETA</div>
+</header>
+<section class="welcome">
+<h1>Hola, soy <span>ORVEX</span></h1>
+<p>Tu espacio creativo impulsado por inteligencia artificial.</p>
+<div class="tools">
+<button onclick="showTab('chat')">💬 Conversar</button>
+<button onclick="showTab('image')">🎨 Crear imagen</button>
+<button onclick="showTab('video')">🎬 Crear video</button>
+</div>
+</section>
+<section class="chat">
+<div class="messages" id="messages">
+<div class="message">¡Hola! Soy ORVEX AI. ¿En qué puedo ayudarte hoy?</div>
+</div>
+<div class="composer">
+<input id="prompt" placeholder="Escribí tu mensaje..." onkeydown="if(event.key==='Enter')sendMessage()">
+<button onclick="sendMessage()">Enviar ↑</button>
+</div>
+<div class="note">Versión inicial · La conexión con los modelos de IA todavía debe configurarse.</div>
+</section>
+</main>
+</div>
+<script>
+function showTab(tab){
+const titles={chat:"Chat inteligente",image:"Generador de imágenes",video:"Generador de videos",library:"Tu biblioteca"};
+document.getElementById("section").textContent=titles[tab];
+if(tab!=="chat"){
+document.getElementById("messages").innerHTML='<div class="message">La sección '+titles[tab]+' está preparada para su integración. Próximamente podrás utilizarla.</div>';
+document.getElementById("prompt").placeholder="Esta función todavía no está conectada...";
+}else{
+document.getElementById("messages").innerHTML='<div class="message">¡Hola! Soy ORVEX AI. ¿En qué puedo ayudarte hoy?</div>';
+document.getElementById("prompt").placeholder="Escribí tu mensaje...";
+}
+}
+function sendMessage(){
+const input=document.getElementById("prompt");
+const value=input.value.trim();
+if(!value)return;
+const messages=document.getElementById("messages");
+const user=document.createElement("div");
+user.className="message user";
+user.textContent=value;
+messages.appendChild(user);
+const reply=document.createElement("div");
+reply.className="message";
+reply.textContent="Tu mensaje llegó a ORVEX AI. Para responder con inteligencia artificial real, falta conectar un servicio de IA al servidor.";
+messages.appendChild(reply);
+input.value="";
+messages.scrollTop=messages.scrollHeight;
+}
+</script>
+</body>
+</html>
