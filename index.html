@@ -32,8 +32,16 @@ header h2{font-size:19px}
 .composer{display:flex;gap:10px;background:#171b2a;padding:10px;border:1px solid #30364a;border-radius:16px}
 .composer input{flex:1;min-width:0;background:transparent;border:0;outline:0;color:white;padding:10px;font-size:15px}
 .composer button{background:#927cff;border:0;border-radius:11px;padding:12px 19px;color:white;font-weight:bold;cursor:pointer}
+.composer button:disabled{opacity:.5;cursor:wait}
 .note{text-align:center;color:#777f95;font-size:11px;margin-top:12px}
-@media(max-width:650px){aside{width:75px;padding:15px 7px}.logo{font-size:15px;text-align:center}nav button{font-size:0;text-align:center;padding:14px 2px}nav button:first-letter{font-size:19px}main{padding:18px 12px}.welcome h1{font-size:34px}}
+@media(max-width:650px){
+aside{width:75px;padding:15px 7px}
+.logo{font-size:15px;text-align:center}
+nav button{font-size:0;text-align:center;padding:14px 2px}
+nav button:first-letter{font-size:19px}
+main{padding:18px 12px}
+.welcome h1{font-size:34px}
+}
 </style>
 </head>
 <body>
@@ -52,6 +60,7 @@ header h2{font-size:19px}
 <h2 id="section">Chat inteligente</h2>
 <div class="tag">ORVEX AI · BETA</div>
 </header>
+
 <section class="welcome">
 <h1>Hola, soy <span>ORVEX</span></h1>
 <p>Tu espacio creativo impulsado por inteligencia artificial.</p>
@@ -61,46 +70,95 @@ header h2{font-size:19px}
 <button onclick="showTab('video')">🎬 Crear video</button>
 </div>
 </section>
+
 <section class="chat">
 <div class="messages" id="messages">
 <div class="message">¡Hola! Soy ORVEX AI. ¿En qué puedo ayudarte hoy?</div>
 </div>
+
 <div class="composer">
 <input id="prompt" placeholder="Escribí tu mensaje..." onkeydown="if(event.key==='Enter')sendMessage()">
-<button onclick="sendMessage()">Enviar ↑</button>
+<button id="sendButton" onclick="sendMessage()">Enviar ↑</button>
 </div>
-<div class="note">Versión inicial · La conexión con los modelos de IA todavía debe configurarse.</div>
+
+<div class="note">ORVEX AI · Asistente inteligente</div>
 </section>
 </main>
 </div>
+
 <script>
 function showTab(tab){
-const titles={chat:"Chat inteligente",image:"Generador de imágenes",video:"Generador de videos",library:"Tu biblioteca"};
+const titles={
+chat:"Chat inteligente",
+image:"Generador de imágenes",
+video:"Generador de videos",
+library:"Tu biblioteca"
+};
+
 document.getElementById("section").textContent=titles[tab];
-if(tab!=="chat"){
-document.getElementById("messages").innerHTML='<div class="message">La sección '+titles[tab]+' está preparada para su integración. Próximamente podrás utilizarla.</div>';
-document.getElementById("prompt").placeholder="Esta función todavía no está conectada...";
-}else{
-document.getElementById("messages").innerHTML='<div class="message">¡Hola! Soy ORVEX AI. ¿En qué puedo ayudarte hoy?</div>';
-document.getElementById("prompt").placeholder="Escribí tu mensaje...";
-}
-}
-function sendMessage(){
-const input=document.getElementById("prompt");
-const value=input.value.trim();
-if(!value)return;
+
 const messages=document.getElementById("messages");
+const input=document.getElementById("prompt");
+
+if(tab!=="chat"){
+messages.innerHTML='<div class="message">La sección '+titles[tab]+' estará disponible próximamente.</div>';
+input.placeholder="Esta función todavía no está conectada...";
+}else{
+messages.innerHTML='<div class="message">¡Hola! Soy ORVEX AI. ¿En qué puedo ayudarte hoy?</div>';
+input.placeholder="Escribí tu mensaje...";
+}
+}
+
+async function sendMessage(){
+const input=document.getElementById("prompt");
+const button=document.getElementById("sendButton");
+const messages=document.getElementById("messages");
+const value=input.value.trim();
+
+if(!value || button.disabled)return;
+
 const user=document.createElement("div");
 user.className="message user";
 user.textContent=value;
 messages.appendChild(user);
+
+input.value="";
+input.disabled=true;
+button.disabled=true;
+button.textContent="...";
+
 const reply=document.createElement("div");
 reply.className="message";
-reply.textContent="Tu mensaje llegó a ORVEX AI. Para responder con inteligencia artificial real, falta conectar un servicio de IA al servidor.";
+reply.textContent="ORVEX está pensando...";
 messages.appendChild(reply);
-input.value="";
+
 messages.scrollTop=messages.scrollHeight;
+
+try{
+const response=await fetch("/api/chat",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({message:value})
+});
+
+const data=await response.json();
+
+if(!response.ok){
+throw new Error(data.error || "Error al conectar con la IA.");
+}
+
+reply.textContent=data.reply || "No recibí una respuesta válida.";
+}catch(error){
+reply.textContent="No pude responder: "+error.message;
+}finally{
+input.disabled=false;
+button.disabled=false;
+button.textContent="Enviar ↑";
+input.focus();
+messages.scrollTop=messages.scrollHeight;
+}
 }
 </script>
 </body>
 </html>
+
